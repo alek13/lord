@@ -134,9 +134,9 @@ minetest.register_craft({
 
 minetest.register_on_player_receive_fields(function(sender, formname, fields)
 	if formname == "lord_money:shop_formspec" then -- форма от магазина
-		local name = sender:get_player_name() -- имя покупателя
+		local player_name = sender:get_player_name() -- имя покупателя
 		if fields.exchange then -- нажата кнопка "купить"
-			local pos = shop.current_shop[name] -- расположение магазина
+			local pos = shop.current_shop[player_name] -- расположение магазина
 			local meta = minetest.get_meta(pos) -- метаданные магазина
 			local mail = ""
 			if minetest.get_modpath("mail_list") then -- если есть мод взаимодействия с e-mail
@@ -149,7 +149,7 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 			if wants == nil or gives == nil then return end -- предохранитель
 			local can_exchange = true -- ставим возможность обмена "да"
 			-- ПРОВЕРКА НАЛИЧИЯ ТОВАРА НА СКЛАДЕ
-			local temp = "temp_"..name
+			local temp = "temp_".. player_name
 			local size = minv:get_size("owner_gives")
 			minv:set_size(temp, size) -- делаем инвентарь-буфер;
 			for _, stack in pairs(gives) do -- проверяем все стеки на продажу
@@ -173,9 +173,9 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 				minetest.log(
 					"action",
 					"магазин " .. minetest.pos_to_string(pos) ..
-						" - игрок " .. name .. " пытался совершить обмен, но товара нет на складе"
+						" - игрок " .. player_name .. " пытался совершить обмен, но товара нет на складе"
 				)
-				minetest.chat_send_player(name, SL("Exchange can not be done, ended goods."))
+				minetest.chat_send_player(player_name, SL("Exchange can not be done, ended goods."))
 				return
 			end
 			-- ПРОВЕРКА СООТВЕТСТВИЯ ОПЛАТЫ ЦЕНЕ
@@ -200,9 +200,9 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 				minetest.log(
 					"action",
 					"магазин " .. minetest.pos_to_string(pos) ..
-						" - игрок " .. name .. " пытался совершить обмен, но его оплата не соответствует цене"
+						" - игрок " .. player_name .. " пытался совершить обмен, но его оплата не соответствует цене"
 				)
-				minetest.chat_send_player(name, SL("Exchange can not be done, check if you put all items!"))
+				minetest.chat_send_player(player_name, SL("Exchange can not be done, check if you put all items!"))
 				return
 			end
 			-- ПРОВЕРКА НАЛИЧИЯ МЕСТА НА СКЛАДЕ
@@ -230,9 +230,9 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 				minetest.log(
 					"action",
 					"магазин " .. minetest.pos_to_string(pos) ..
-						" - игрок " .. name .. " пытался совершить обмен, но на складе не оказалось места"
+						" - игрок " .. player_name .. " пытался совершить обмен, но на складе не оказалось места"
 				)
-				minetest.chat_send_player(name, SL("Exchange can not be done, ended place."))
+				minetest.chat_send_player(player_name, SL("Exchange can not be done, ended place."))
 				return
 			end
 			-- ПРОВЕРКА НАЛИЧИЯ МЕСТА У ПОКУПАТЕЛЯ
@@ -256,9 +256,9 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 				minetest.log(
 					"action",
 					"магазин " .. minetest.pos_to_string(pos) ..
-						" - игрок " .. name .. " пытался совершить обмен, но у него не оказалось места"
+						" - игрок " .. player_name .. " пытался совершить обмен, но у него не оказалось места"
 				)
-				minetest.chat_send_player(name, SL("Exchange can not be done, check if you have place!"))
+				minetest.chat_send_player(player_name, SL("Exchange can not be done, check if you have place!"))
 				return
 			end
 			-- ВРОДЕ ВСЁ НОРМАЛЬНО, ПРОИЗВОДИМ ОБМЕН
@@ -271,8 +271,8 @@ minetest.register_on_player_receive_fields(function(sender, formname, fields)
 				pinv:add_item("customer_gets", stack) -- добавляем к игроку
 			end
 			-- пишем отчёт "всё в порядке" и выходим из функции.
-			minetest.log("action", "магазин "..minetest.pos_to_string(pos).." - игрок "..name.." произвёл обмен - всё в порядке")
-			minetest.chat_send_player(name, SL("Exchanged!"))
+			minetest.log("action", "магазин "..minetest.pos_to_string(pos).." - игрок ".. player_name .." произвёл обмен - всё в порядке")
+			minetest.chat_send_player(player_name, SL("Exchanged!"))
 		elseif fields.quit then -- выход с формы
 			local inv = sender:get_inventory()
 			for i = 1, inv:get_size("customer_gives") do -- для всех стеков в customer_gives
